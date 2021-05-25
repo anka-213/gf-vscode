@@ -1,7 +1,7 @@
 {
 	"name": "gf-vscode",
 	"description": "A language server for Grammatical Framework",
-	"author": "Microsoft Corporation",
+	"author": "Andreas Källberg",
 	"license": "MIT",
 	"version": "1.0.0",
 	"repository": {

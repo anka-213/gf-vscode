@@ -17,23 +17,17 @@ let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 	// The server is implemented in node
-	let serverExe = 'gf-lsp';
-	// The debug options for the server
-	// --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
-	let debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
+	const serverExe = 'gf-lsp';
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
-	let serverOptions: ServerOptions = {
+	const serverOptions: ServerOptions = {
 		run: { command: serverExe, args: ['-lsp'] },
-		debug: {
-			command: serverExe,
-			args: ['-lsp']
-		}
+		debug: { command: serverExe, args: ['-lsp'] }
 	};
 
 	// Options to control the language client
-	let clientOptions: LanguageClientOptions = {
+	const clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
 		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
 		synchronize: {
@@ -44,8 +38,8 @@ export function activate(context: ExtensionContext) {
 
 	// Create the language client and start the client.
 	client = new LanguageClient(
-		'languageServerExample',
-		'Language Server Example',
+		'gfLsp',
+		'GF LSP client',
 		serverOptions,
 		clientOptions
 	);

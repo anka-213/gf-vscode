@@ -72,7 +72,7 @@
 			{
 				"language": "gf",
 				"scopeName": "source.gf",
-				"path": "./grammars/gf.tmlanguage.json"
+				"path": "./grammars/gf.tmLanguage.json"
 			}
 		]
 	},

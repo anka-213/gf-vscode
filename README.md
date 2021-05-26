@@ -2,6 +2,13 @@
 
 This provides syntax highlighting and a client for the GF Language Server Protocol server: [gf-lsp](https://github.com/anka-213/gf-lsp).
 
+## Installation
+
+You can install the server by first installing [nix](https://nixos.org/) and then running:
+```
+nix-env -if https://github.com/anka-213/gf-lsp/archive/main.tar.gz
+```
+
 ## Developing
 
 - Run `npm install` in this folder. This installs all necessary npm modules in both the client and server folder

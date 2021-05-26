@@ -19,7 +19,7 @@
 	"activationEvents": [
 		"onLanguage:gf"
 	],
-	"main": "./out/extension",
+	"main": "./out/main",
 	"contributes": {
 		"configuration": {
 			"type": "object",

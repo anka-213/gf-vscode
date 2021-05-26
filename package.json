@@ -41,6 +41,12 @@
 					],
 					"default": "off",
 					"description": "Traces the communication between VS Code and the language server."
+				},
+				"gf-lsp.serverExecutablePath": {
+					"scope": "resource",
+					"type": "string",
+					"default": "",
+					"description": "Manually set a language server executable. Can be something on the $PATH or a path to an executable itself. Works with ~, ${HOME} and ${workspaceFolder}."
 				}
 			}
 		},

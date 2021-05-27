@@ -8,7 +8,7 @@ You can install the server by first installing [nix](https://nixos.org/) and the
 ```
 nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
 cachix use anka-213                                                # Use my binary cache
-nix-env -if https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
+nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
 ```
 
 ## Developing

@@ -10,7 +10,8 @@
 		"url": "https://github.com/anka-213/gf-vscode"
 	},
 	"publisher": "anka-213",
-	"categories": [],
+	"icon": "gf-logo.png",
+	"categories": ["Programming Languages"],
 	"keywords": [
 		"multi-root ready"
 	],

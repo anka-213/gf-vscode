@@ -4,8 +4,9 @@ This provides syntax highlighting and a client for the [Grammatical Framework](h
 
 ## Installation
 
-You can install the server by first installing [nix](https://nixos.org/) and then running:
+You can install the server by installing [nix](https://nixos.org/) and running:
 ```
+sh <(curl -L https://nixos.org/nix/install) --daemon               # Install nix
 nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
 cachix use anka-213                                                # Use my binary cache
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server

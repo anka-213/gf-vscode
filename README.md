@@ -4,11 +4,15 @@ This provides syntax highlighting and a client for the [Grammatical Framework](h
 
 ## Installation
 
-You can install the server by installing [nix](https://nixos.org/) and running:
+In order to install the server you first need to install [nix](https://nixos.org/) by running:
 ```
 sh <(curl -L https://nixos.org/nix/install) --daemon               # Install nix
+```
+When the installation is completed, you can install the lsp-server by running in a new terminal:
+```
 nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
-cachix use anka-213                                                # Use my binary cache
+sudo cachix use anka-213                                           # Use my binary cache which contains pre-built versions of the lsp-server
+nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-run # Download the GF Language Server and check what will be installed
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
 ```
 

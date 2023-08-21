@@ -4,6 +4,19 @@ This provides syntax highlighting and a client for the [Grammatical Framework](h
 
 ## Installation
 
+### Linux
+
+You can either download a binary from the repository or use nix to install it with the instructions in the next section
+
+You can download the latest binary from [here](https://github.com/anka-213/gf-lsp/releases/tag/prerelease).
+- Download the `gf-lsp-linux-bundle`
+- Rename it to `gf-lsp`
+- make it executable using `chmod +x gf-lsp`
+- and put it in one of the directories in your `$PATH`
+
+After that reload your vscode window, to make the extension aware of it
+
+### Nix: Mac or Linux
 In order to install the server you first need to install [nix](https://nixos.org/) by running:
 ```
 sh <(curl -L https://nixos.org/nix/install) --daemon               # Install nix
@@ -16,9 +29,13 @@ nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
 ```
 
+### Windows
+
+There is unfortunately no windows build yet. You can use the linux version in the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) (WSL)
+
 ## Updating
 
-Use this command to update the server to the latest version
+If you installed using nix, you can use this command to update the server to the latest version
 ```
 NIX_CONFIG="tarball-ttl = 0" nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/master.tar.gz
 ```

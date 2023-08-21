@@ -116,7 +116,8 @@ function findLocalServer(context: ExtensionContext): string | null {
 	const exes: string[] = [
 		'gf-lsp',
 		os.homedir + '/.cabal/bin/gf-lsp',
-		os.homedir + '/.local/bin/gf-lsp'
+		os.homedir + '/.local/bin/gf-lsp',
+		os.homedir + '/.nix-profile/bin/gf-lsp'
 	];
 
 	for (const exe of exes) {

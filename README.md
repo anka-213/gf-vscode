@@ -36,3 +36,11 @@ The tarball-ttl flag forces it to refetch the tarball so you can be sure you hav
 - If you want to debug the server as well use the launch configuration `Attach to Server`
 - In the [Extension Development Host] instance of VSCode, open a document in 'gf' language mode.
   - Cause some error and you should see diagnostics
+
+### Making new releases
+
+- Test that it works using the above instructions
+- Update changelog
+- Bump the version number in package.json
+- Tag the commit with a version number
+- `node_modules/.bin/vsce package && node_modules/.bin/vsce publish`

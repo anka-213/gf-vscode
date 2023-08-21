@@ -16,6 +16,15 @@ nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
 ```
 
+## Updating
+
+Use this command to update the server to the latest version
+```
+NIX_CONFIG="tarball-ttl = 0" nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/master.tar.gz
+```
+
+The tarball-ttl flag forces it to refetch the tarball so you can be sure you have the latest version
+
 ## Developing
 
 - Run `npm install` in this folder. This installs all necessary npm modules in the client folder

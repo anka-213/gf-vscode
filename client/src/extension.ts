@@ -7,6 +7,7 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import {
 	workspace,
 	ExtensionContext,
@@ -24,7 +25,7 @@ import {
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 	// The server is implemented in haskell
 	// const serverExe = '/Users/anka/.cabal/bin/gf-lsp';
 
@@ -33,9 +34,25 @@ export function activate(context: ExtensionContext) {
 		// Try and find local installations first
 		serverExecutable = findManualExecutable() ?? findLocalServer(context);
 		if (serverExecutable === null) {
+			console.log('Found no executable');
 			// If not, then try to download gf-language-server binaries if it's selected
-			// serverExecutable = await downloadGfLanguageServer(context);
+			serverExecutable = await downloadGfLanguageServer(context);
 			if (!serverExecutable) {
+				const RELOAD_WINDOW = 'Reload window';
+				const answer = await window.showWarningMessage(
+					'No gf-lsp server found. Reload the window after you have installed it',
+					RELOAD_WINDOW
+				);
+				switch (answer) {
+					case RELOAD_WINDOW:
+						vscode.commands.executeCommand(
+							'workbench.action.reloadWindow'
+						);
+						break;
+
+					default:
+						break;
+				}
 				return;
 			}
 		}
@@ -105,7 +122,7 @@ function findManualExecutable(folder?: WorkspaceFolder): string | null {
 
 	if (!executableExists(exePath)) {
 		throw new Error(
-			`serverExecutablePath is set to ${exePath} but it doesn't exist and is not on the PATH`
+			`config serverExecutablePath is set to ${exePath} but there is no such executable and I can't find it in PATH`
 		);
 	}
 	return exePath;
@@ -137,4 +154,34 @@ export function executableExists(exe: string): boolean {
 	const cmd: string = isWindows ? 'where' : 'which';
 	const out = child_process.spawnSync(cmd, [exe]);
 	return out.status === 0 || (isWindows && fs.existsSync(exe));
+}
+async function downloadGfLanguageServer(context: ExtensionContext) {
+	const ToWebsite = 'Go to Download page';
+	const DownAuto = 'Download automatically';
+	const answer = await window.showErrorMessage(
+		'No gf-lsp executable found. Follow the instructions in the readme to download it.',
+		ToWebsite
+		// DownAuto
+	);
+	switch (answer) {
+		case ToWebsite:
+			vscode.env.openExternal(
+				vscode.Uri.parse(
+					'https://github.com/anka-213/gf-lsp/releases/tag/prerelease'
+				)
+			);
+			break;
+
+		case DownAuto:
+			break;
+
+		case undefined:
+			console.log('Got undef');
+			break;
+
+		default:
+			console.log('Got default');
+			break;
+	}
+	return;
 }

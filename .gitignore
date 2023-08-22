@@ -2,3 +2,5 @@ out
 node_modules
 client/server
 .vscode-test
+gf-vscode-*.vsix
+.gf-lsp

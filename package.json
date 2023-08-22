@@ -95,7 +95,8 @@
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"postinstall": "cd client && npm install && cd ..",
-		"test": "sh ./scripts/e2e.sh"
+		"test": "sh ./scripts/e2e.sh",
+		"publish": "node_modules/.bin/vsce package && node_modules/.bin/vsce publish"
 	},
 	"devDependencies": {
 		"@types/mocha": "^8.2.2",

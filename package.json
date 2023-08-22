@@ -4,7 +4,7 @@
 	"description": "A language server client for Grammatical Framework",
 	"author": "Andreas Källberg",
 	"license": "MIT",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/anka-213/gf-vscode"
@@ -22,6 +22,8 @@
 		"onLanguage:gf"
 	],
 	"main": "./out/main",
+	"main-local": "./client/out/extension",
+	"main-remote": "./out/main",
 	"contributes": {
 		"configuration": {
 			"type": "object",

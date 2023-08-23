@@ -19,7 +19,7 @@ After that reload your vscode window, to make the extension aware of it
 ### Nix: Mac or Linux
 In order to install the server you first need to install [nix](https://nixos.org/) by running:
 ```
-sh <(curl -L https://nixos.org/nix/install) --daemon               # Install nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 When the installation is completed, you can install the lsp-server by running in a new terminal:
 ```

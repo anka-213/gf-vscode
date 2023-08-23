@@ -57,11 +57,12 @@ export function boolean(): Validator<boolean> {
 	return typeGuard('boolean', boolGuard);
 }
 
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+// eslint-disable-next-line @typescript-eslint/ban-types
+function hasOwnProperty<X extends object, Y extends PropertyKey>(
 	obj: X,
 	prop: Y
 ): obj is X & Record<Y, unknown> {
-	return obj.hasOwnProperty(prop);
+	return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
 export function object<S>(schema: {

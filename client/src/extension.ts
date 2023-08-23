@@ -33,10 +33,11 @@ export async function activate(context: ExtensionContext) {
 	try {
 		// Try and find local installations first
 		serverExecutable = findManualExecutable() ?? findLocalServer(context);
+		// // eslint-disable-next-line no-constant-condition
 		if (serverExecutable === null) {
 			console.log('Found no executable');
 			// If not, then try to download gf-language-server binaries if it's selected
-			serverExecutable = await downloadGfLanguageServer(context);
+			serverExecutable = await askToDownloadGfLanguageServer(context);
 			if (!serverExecutable) {
 				const RELOAD_WINDOW = 'Reload window';
 				const answer = await window.showWarningMessage(
@@ -155,12 +156,24 @@ export function executableExists(exe: string): boolean {
 	const out = child_process.spawnSync(cmd, [exe]);
 	return out.status === 0 || (isWindows && fs.existsSync(exe));
 }
-async function downloadGfLanguageServer(context: ExtensionContext) {
+
+async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	const ToWebsite = 'Go to Download page';
 	const DownAuto = 'Download automatically';
-	const answer = await window.showErrorMessage(
+	const DownAutoNix = 'Install using nix';
+
+	// TODO: Handle windows
+
+	// Apple silicon or some other strange platform
+	const isArm = process.arch === 'arm64';
+
+	const opts = [ToWebsite];
+	if (executableExists('nix-env') || isArm) {
+		opts.unshift(DownAutoNix);
+	}
+	const answer = await window.showWarningMessage(
 		'No gf-lsp executable found. Follow the instructions in the readme to download it.',
-		ToWebsite
+		...opts
 		// DownAuto
 	);
 	switch (answer) {
@@ -173,7 +186,10 @@ async function downloadGfLanguageServer(context: ExtensionContext) {
 			break;
 
 		case DownAuto:
-			break;
+			return await downloadGfLanguageServer(context);
+		// break;
+		case DownAutoNix:
+			return await downloadUsingNix(context);
 
 		case undefined:
 			console.log('Got undef');
@@ -184,4 +200,129 @@ async function downloadGfLanguageServer(context: ExtensionContext) {
 			break;
 	}
 	return;
+}
+
+async function downloadGfLanguageServer(context: ExtensionContext) {
+	return;
+}
+
+async function downloadUsingNix(context: vscode.ExtensionContext) {
+	if (!executableExists('nix-env')) {
+		const terminal = vscode.window.createTerminal({
+			name: `Installing the Nix tool`,
+			shellPath: 'sh',
+			shellArgs: [
+				'-c',
+				`
+			curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+			curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install ||
+			{
+			status=$?;
+			sleep 5;
+			exit $status
+			}`
+			]
+
+			// isTransient: true
+		});
+		terminal.show();
+		const result = await getExitStatus(terminal);
+		if (result.code !== 0) {
+			await showErrorReportMsg(
+				`Failed to install nix.
+			Please try again or open an issue or contact me (Anka) on the GF discord`
+			);
+			return null;
+		}
+	}
+	const terminal = vscode.window.createTerminal({
+		name: `Installing the GF Language server`,
+		shellPath: 'sh',
+		shellArgs: [
+			'-c',
+			`
+			if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+              . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+            fi
+			echo nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz;
+			nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz ||
+			{
+			status=$?;
+			sleep 5;
+			exit $status
+			}`
+		]
+		// shellPath: 'nix-env',
+		// shellArgs: [
+		// 	'-iA',
+		// 	'exe',
+		// 	'-f',
+		// 	'https://github.com/anka-213/gf-lsp/archive/main.tar.gz'
+		// ]
+
+		// isTransient: true
+	});
+	terminal.show();
+	// terminal.sendText(
+	// 	'nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz',
+	// 	false
+	// );
+	// terminal.sendText('; exit');
+	const result = await getExitStatus(terminal);
+	if (result.code !== 0) {
+		await showErrorReportMsg(
+			`Failed to install the GF language server using nix.
+			Please try again or open an issue or contact me (Anka) on the GF discord`
+		);
+		return null;
+		// throw new Error(
+		// 	// `Failed to install using nix: Got error code ${result.code}`
+		// 	`Failed to install using nix. Please try again or open an issue or contact me on the GF discord`
+		// );
+	}
+	// await window.showInformationMessage(
+	// 	`Got answer: ${JSON.stringify(result)}`
+	// );
+	return os.homedir + '/.nix-profile/bin/gf-lsp';
+}
+
+async function showErrorReportMsg(msg: string) {
+	const ISSUE = 'Open issue';
+	const DISCORD = 'Go to GF discord';
+	const answer = await window.showErrorMessage(msg, ISSUE, DISCORD);
+	switch (answer) {
+		case ISSUE:
+			vscode.env.openExternal(
+				vscode.Uri.parse(
+					'https://github.com/anka-213/gf-vscode/issues/new'
+				)
+			);
+			break;
+		case DISCORD:
+			vscode.env.openExternal(
+				vscode.Uri.parse('https://discord.gg/EvfUsjzmaz')
+			);
+			break;
+
+		default:
+			break;
+	}
+}
+
+// Get the exit status of a terminal
+async function getExitStatus(terminal: vscode.Terminal) {
+	return await new Promise<vscode.TerminalExitStatus>((resolve, reject) => {
+		const disposeToken = vscode.window.onDidCloseTerminal(
+			async (closedTerminal) => {
+				if (closedTerminal === terminal) {
+					disposeToken.dispose();
+					if (terminal.exitStatus !== undefined) {
+						resolve(terminal.exitStatus);
+					} else {
+						reject('Terminal exited with undefined status');
+					}
+				}
+			}
+		);
+	});
 }

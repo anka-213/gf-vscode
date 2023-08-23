@@ -23,8 +23,11 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 ```
 When the installation is completed, you can install the lsp-server by running in a new terminal:
 ```
+# Optional (Use prebuilt cache)
 nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
+# Optional (Use prebuilt cache)
 sudo cachix use anka-213                                           # Use my binary cache which contains pre-built versions of the lsp-server
+# Optional (see what will be downloaded before downloading)
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-run # Download the GF Language Server and check what will be installed
 nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
 ```

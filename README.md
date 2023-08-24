@@ -4,33 +4,11 @@ This provides syntax highlighting and a client for the [Grammatical Framework](h
 
 ## Installation
 
-### Linux
+### Linux and MacOS
 
-You can either download a binary from the repository or use nix to install it with the instructions in the next section
+The extension will automatically download and install the latest release for you.
 
-You can download the latest binary from [here](https://github.com/anka-213/gf-lsp/releases/tag/prerelease).
-- Download the `gf-lsp-linux-bundle`
-- Rename it to `gf-lsp`
-- make it executable using `chmod +x gf-lsp`
-- and put it in one of the directories in your `$PATH`
-
-After that reload your vscode window, to make the extension aware of it
-
-### Nix: Mac or Linux
-In order to install the server you first need to install [nix](https://nixos.org/) by running:
-```
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-```
-When the installation is completed, you can install the lsp-server by running in a new terminal:
-```
-# Optional (Use prebuilt cache)
-nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
-# Optional (Use prebuilt cache)
-sudo cachix use anka-213                                           # Use my binary cache which contains pre-built versions of the lsp-server
-# Optional (see what will be downloaded before downloading)
-nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-run # Download the GF Language Server and check what will be installed
-nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
-```
+If you are running an M1 or M2 mac it will ask to autoamatically compile it on your computer, since I don't have access to an Apple Silicon Mac to compile it on.
 
 ### Windows
 
@@ -44,6 +22,28 @@ NIX_CONFIG="tarball-ttl = 0" nix-env -iA exe -f https://github.com/anka-213/gf-l
 ```
 
 The tarball-ttl flag forces it to refetch the tarball so you can be sure you have the latest version
+
+## Manual installation
+
+### Linux or intel mac
+
+Follow the instructions in the [latest release](https://github.com/anka-213/gf-lsp/releases) of the GF Language server.
+
+### Nix: Mac or Linux
+In order to build the server you first need to install [nix](https://nixos.org/) by running:
+```
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
+When the installation is completed, you can install the lsp-server by running in a new terminal:
+```
+# Optional (Use prebuilt cache)
+nix-env -iA cachix -f https://cachix.org/api/v1/install            # Install cachix for faster installation
+# Optional (Use prebuilt cache)
+sudo cachix use anka-213                                           # Use my binary cache which contains pre-built versions of the lsp-server
+# Optional (see what will be downloaded before downloading)
+nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz --dry-run # Download the GF Language Server and check what will be installed
+nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Download and build the GF Language Server
+```
 
 ## Developing
 

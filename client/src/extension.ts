@@ -196,7 +196,7 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	// Apple silicon or some other strange platform
 	const isArm = process.arch === 'arm64';
 
-	const opts = [DownAuto, ToWebsite];
+	const opts = [ToWebsite];
 	if (executableExists('nix-env') || isArm) {
 		opts.unshift(DownAutoNix);
 	}

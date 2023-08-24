@@ -163,11 +163,35 @@ export function executableExists(exe: string): boolean {
 }
 
 async function askToDownloadGfLanguageServer(context: ExtensionContext) {
-	const ToWebsite = 'Go to Download page';
+	if (process.platform === 'win32') {
+		throw new Error('Unfortunately Windows is not yet supported');
+	}
+
+	const archName = `${process.platform}-process.arch}`;
+	if (archName === 'darwin-x64' || archName == 'linux-x64') {
+		// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
+		const clientLogLevel =
+			workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
+		const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
+
+		const outputChannel: vscode.OutputChannel =
+			window.createOutputChannel('GF Language');
+
+		// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
+		const logFilePath =
+			logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
+		const logger: Logger = new ExtensionLogger(
+			'client',
+			clientLogLevel,
+			outputChannel,
+			logFilePath
+		);
+		return await downloadGFLanguageServer(context, logger);
+	}
+
+	const ToWebsite = 'Go to Manual install instructions';
 	const DownAuto = 'Download automatically';
 	const DownAutoNix = 'Install using nix';
-
-	// TODO: Handle windows
 
 	// Apple silicon or some other strange platform
 	const isArm = process.arch === 'arm64';
@@ -177,38 +201,20 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 		opts.unshift(DownAutoNix);
 	}
 	const answer = await window.showWarningMessage(
-		'No gf-lsp executable found. Follow the instructions in the readme to download it.',
+		`No prebuilt executable is available for ${archName}.
+		I can build it for you using nix, it will take ~5G disk space and `,
 		...opts
 		// DownAuto
-	);
-	// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
-	const clientLogLevel =
-		workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
-	const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
-
-	const outputChannel: vscode.OutputChannel =
-		window.createOutputChannel('GF Language');
-
-	// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
-	const logFilePath =
-		logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
-	const logger: Logger = new ExtensionLogger(
-		'client',
-		clientLogLevel,
-		outputChannel,
-		logFilePath
 	);
 	switch (answer) {
 		case ToWebsite:
 			vscode.env.openExternal(
-				vscode.Uri.parse(
-					'https://github.com/anka-213/gf-lsp/releases/tag/prerelease'
-				)
+				vscode.Uri.parse('https://github.com/anka-213/gf-lsp/README.md')
 			);
 			break;
 
-		case DownAuto:
-			return await downloadGFLanguageServer(context, logger);
+		// case DownAuto:
+		// 	return await downloadGFLanguageServer(context, logger);
 		// break;
 		case DownAutoNix:
 			return await downloadUsingNix(context);

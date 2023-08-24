@@ -46,6 +46,22 @@
 					"default": "off",
 					"description": "Traces the communication between VS Code and the language server."
 				},
+				"gf-lsp.updateBehavior": {
+					"scope": "machine",
+					"type": "string",
+					"enum": [
+					  "keep-up-to-date",
+					  "prompt",
+					  "never-check"
+					],
+					"enumDescriptions": [
+					  "Always download the latest available version when it is published",
+					  "Prompt before upgrading to a newer version",
+					  "Don't check for newer versions"
+					],
+					"default": "keep-up-to-date",
+					"markdownDescription": "Determine what to do when a new version of the language server is available."
+				  },
 				"gf-lsp.serverExecutablePath": {
 					"scope": "resource",
 					"type": "string",

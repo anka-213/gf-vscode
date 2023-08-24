@@ -57,6 +57,7 @@ const cachedReleaseValidator: validate.Validator<IRelease[] | null> =
 // On Windows the executable needs to be stored somewhere with an .exe extension
 const exeExt = process.platform === 'win32' ? '.exe' : '';
 
+/*
 class MissingToolError extends Error {
 	public readonly tool: string;
 	constructor(tool: string) {
@@ -93,21 +94,16 @@ class MissingToolError extends Error {
 		}
 	}
 }
+*/
 
 // tslint:disable-next-line: max-classes-per-file
 class NoBinariesError extends Error {
-	constructor(hlsVersion: string, ghcVersion?: string) {
+	constructor(hlsVersion: string) {
 		const supportedReleasesLink =
 			'[See the list of supported versions here](https://github.com/anka-213/gf-vscode#supported-versions)';
-		if (ghcVersion) {
-			super(
-				`gf-language-server ${hlsVersion} or earlier for GHC ${ghcVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
-			);
-		} else {
-			super(
-				`gf-language-server ${hlsVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
-			);
-		}
+		super(
+			`gf-language-server ${hlsVersion} is not available on ${os.type()}-${os.arch()}. ${supportedReleasesLink}`
+		);
 	}
 }
 
@@ -115,6 +111,8 @@ class NoBinariesError extends Error {
  * if needed. Returns null if there was an error in either downloading the wrapper or
  * in working out the ghc version
  */
+
+/*
 async function getProjectGhcVersion(
 	context: ExtensionContext,
 	logger: Logger,
@@ -245,6 +243,8 @@ async function getProjectGhcVersion(
 	return callWrapper(downloadedWrapper);
 }
 
+*/
+
 async function getReleaseMetadata(
 	context: ExtensionContext,
 	storagePath: string,
@@ -330,6 +330,8 @@ async function getReleaseMetadata(
 	try {
 		const releaseInfo = await httpsGetSilently(opts);
 		const releaseInfoParsed =
+			// validate.parseAndValidate(releaseInfo, githubReleaseApiValidator) ||
+			// null;
 			validate
 				.parseAndValidate(releaseInfo, githubReleaseApiValidator)
 				.filter((x) => !x.prerelease) || null;
@@ -347,8 +349,8 @@ async function getReleaseMetadata(
 			) {
 				const promptMessage =
 					cachedInfoParsed === null
-						? 'No version of the gf-language-server is installed, would you like to install it now?'
-						: 'A new version of the gf-language-server is available, would you like to upgrade now?';
+						? 'No version of the GF Language Server is installed, would you like to install it now?'
+						: 'A new version of the GF Language Server is available, would you like to upgrade now?';
 
 				const decision = await window.showInformationMessage(
 					promptMessage,
@@ -393,9 +395,9 @@ async function getReleaseMetadata(
  */
 export async function downloadGFLanguageServer(
 	context: ExtensionContext,
-	logger: Logger,
-	resource: Uri,
-	folder?: WorkspaceFolder
+	logger: Logger
+	// resource: Uri,
+	// folder?: WorkspaceFolder
 ): Promise<string | null> {
 	// Make sure to create this before getProjectGhcVersion
 	logger.info('Downloading gf-language-server');
@@ -438,68 +440,69 @@ export async function downloadGFLanguageServer(
 		return null;
 	}
 	logger.info(`The latest known release is ${releases[0].tag_name}`);
-	const dir: string = folder?.uri?.fsPath ?? path.dirname(resource.fsPath);
-	let ghcVersion: string;
-	try {
-		ghcVersion = await getProjectGhcVersion(
-			context,
-			logger,
-			dir,
-			releases[0],
-			storagePath
-		);
-	} catch (error) {
-		if (error instanceof MissingToolError) {
-			const link = error.installLink();
-			if (link) {
-				if (
-					await window.showErrorMessage(
-						error.message,
-						`Install ${error.tool}`
-					)
-				) {
-					env.openExternal(link);
-				}
-			} else {
-				await window.showErrorMessage(error.message);
-			}
-		} else if (error instanceof NoBinariesError) {
-			window.showInformationMessage(error.message);
-		} else if (error instanceof Error) {
-			// We couldn't figure out the right ghc version to download
-			window.showErrorMessage(
-				`Couldn't figure out what GHC version the project is using: ${error.message}`
-			);
-		}
-		return null;
-	}
+	// const dir: string = folder?.uri?.fsPath ?? path.dirname(resource.fsPath);
+	// let ghcVersion: string;
+	// try {
+	// 	ghcVersion = await getProjectGhcVersion(
+	// 		context,
+	// 		logger,
+	// 		dir,
+	// 		releases[0],
+	// 		storagePath
+	// 	);
+	// } catch (error) {
+	// 	if (error instanceof MissingToolError) {
+	// 		const link = error.installLink();
+	// 		if (link) {
+	// 			if (
+	// 				await window.showErrorMessage(
+	// 					error.message,
+	// 					`Install ${error.tool}`
+	// 				)
+	// 			) {
+	// 				env.openExternal(link);
+	// 			}
+	// 		} else {
+	// 			await window.showErrorMessage(error.message);
+	// 		}
+	// 	} else if (error instanceof NoBinariesError) {
+	// 		window.showInformationMessage(error.message);
+	// 	} else if (error instanceof Error) {
+	// 		// We couldn't figure out the right ghc version to download
+	// 		window.showErrorMessage(
+	// 			`Couldn't figure out what GHC version the project is using: ${error.message}`
+	// 		);
+	// 	}
+	// 	return null;
+	// }
 
 	// When searching for binaries, use startsWith because the compression may differ
 	// between .zip and .gz
-	const assetName = `gf-lsp-${githubOS}-${ghcVersion}${exeExt}`;
+	const arch = process.arch; // x64 or arm64
+	const assetName = `gf-lsp-${githubOS}-${arch}`;
 	logger.info(`Search for binary ${assetName} in release assets`);
 	const release = releases?.find((r) =>
 		r.assets.find((x) => x.name.startsWith(assetName))
 	);
 	const asset = release?.assets.find((x) => x.name.startsWith(assetName));
 	if (!asset) {
-		let msg = new NoBinariesError(releases[0].tag_name, ghcVersion).message;
+		let msg = new NoBinariesError(releases[0].tag_name).message;
 		if (updateBehaviour === 'never-check') {
 			msg +=
-				". Consider set 'gf-lsp.updateBehaviour' to 'up-to-date' to check if another release includes the missing binary";
+				". Consider setting 'gf-lsp.updateBehaviour' to 'up-to-date' to check if another release includes the missing binary";
 		}
 		logger.error(msg);
 		window.showErrorMessage(msg);
 		return null;
 	}
 
-	const serverName = `gf-lsp-${release?.tag_name}-${process.platform}-${ghcVersion}${exeExt}`;
+	const serverName = `gf-lsp-${release?.tag_name}-${process.platform}-${arch}${exeExt}`;
 	const binaryDest = path.join(storagePath, serverName);
 
 	logger.info(
 		`Looking for an existing ${binaryDest} or download it from release assets`
 	);
-	const title = `Downloading gf-language-server ${release?.tag_name} for GHC ${ghcVersion}`;
+	const title = `Downloading GF Language Server ${release?.tag_name}`;
 
 	const downloaded = await downloadFile(
 		title,
@@ -510,7 +513,7 @@ export async function downloadGFLanguageServer(
 		const warning =
 			`gf-language-server ${
 				releases[0].tag_name
-			} for GHC ${ghcVersion} is not available on ${os.type()}.  ` +
+			} is not available on ${os.type()}-${arch} .  ` +
 			`Falling back to gf-language-server ${release?.tag_name}`;
 		logger.warn(warning);
 		if (downloaded) {
@@ -525,7 +528,7 @@ function getGithubOS(): string | null {
 	function platformToGithubOS(x: string): string | null {
 		switch (x) {
 			case 'darwin':
-				return 'macOS';
+				return 'MacOS';
 			case 'linux':
 				return 'Linux';
 			case 'win32':

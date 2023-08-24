@@ -19,9 +19,13 @@ import {
 import {
 	LanguageClient,
 	LanguageClientOptions,
+	Logger,
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient/node';
+import { downloadGFLanguageServer } from './gfLSPBinaries';
+import { ExtensionLogger, expandHomeDir } from './utils';
+import * as utils from './utils';
 
 let client: LanguageClient;
 
@@ -66,6 +70,7 @@ export async function activate(context: ExtensionContext) {
 
 	// DONE: Make server location configurable
 	// TODO: Make gf flags configurable
+	// TODO: Figure out how to avoid reconfiguring main: in package.json
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -167,7 +172,7 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	// Apple silicon or some other strange platform
 	const isArm = process.arch === 'arm64';
 
-	const opts = [ToWebsite];
+	const opts = [DownAuto, ToWebsite];
 	if (executableExists('nix-env') || isArm) {
 		opts.unshift(DownAutoNix);
 	}
@@ -175,6 +180,23 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 		'No gf-lsp executable found. Follow the instructions in the readme to download it.',
 		...opts
 		// DownAuto
+	);
+	// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
+	const clientLogLevel =
+		workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
+	const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
+
+	const outputChannel: vscode.OutputChannel =
+		window.createOutputChannel('GF Language');
+
+	// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
+	const logFilePath =
+		logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
+	const logger: Logger = new ExtensionLogger(
+		'client',
+		clientLogLevel,
+		outputChannel,
+		logFilePath
 	);
 	switch (answer) {
 		case ToWebsite:
@@ -186,7 +208,7 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 			break;
 
 		case DownAuto:
-			return await downloadGfLanguageServer(context);
+			return await downloadGFLanguageServer(context, logger);
 		// break;
 		case DownAutoNix:
 			return await downloadUsingNix(context);
@@ -202,9 +224,9 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	return;
 }
 
-async function downloadGfLanguageServer(context: ExtensionContext) {
-	return;
-}
+// async function downloadGfLanguageServer(context: ExtensionContext) {
+// 	return;
+// }
 
 async function downloadUsingNix(context: vscode.ExtensionContext) {
 	if (!executableExists('nix-env')) {

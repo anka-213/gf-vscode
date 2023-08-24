@@ -167,7 +167,7 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 		throw new Error('Unfortunately Windows is not yet supported');
 	}
 
-	const archName = `${process.platform}-process.arch}`;
+	const archName = `${process.platform}-${process.arch}`;
 	if (archName === 'darwin-x64' || archName == 'linux-x64') {
 		// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
 		const clientLogLevel =
@@ -202,7 +202,7 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	}
 	const answer = await window.showWarningMessage(
 		`No prebuilt executable is available for ${archName}.
-		I can build it for you using nix, it will take ~5G disk space and `,
+		I can build it for you using nix, it will take ~5G disk space and around 5-15 minutes.`,
 		...opts
 		// DownAuto
 	);

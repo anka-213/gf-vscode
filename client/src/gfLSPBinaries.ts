@@ -81,13 +81,13 @@ class MissingToolError extends Error {
 
 	public installLink(): Uri | null {
 		switch (this.tool) {
-			case 'Stack':
-				return Uri.parse(
-					'https://docs.haskellstack.org/en/stable/install_and_upgrade/'
-				);
-			case 'Cabal':
-			case 'GHC':
-				return Uri.parse('https://www.haskell.org/ghcup/');
+			// case 'Stack':
+			// 	return Uri.parse(
+			// 		'https://docs.haskellstack.org/en/stable/install_and_upgrade/'
+			// 	);
+			// case 'Cabal':
+			// case 'GHC':
+			// 	return Uri.parse('https://www.haskell.org/ghcup/');
 			default:
 				return null;
 		}
@@ -98,20 +98,20 @@ class MissingToolError extends Error {
 class NoBinariesError extends Error {
 	constructor(hlsVersion: string, ghcVersion?: string) {
 		const supportedReleasesLink =
-			'[See the list of supported versions here](https://github.com/haskell/vscode-haskell#supported-ghc-versions)';
+			'[See the list of supported versions here](https://github.com/anka-213/gf-vscode#supported-versions)';
 		if (ghcVersion) {
 			super(
-				`haskell-language-server ${hlsVersion} or earlier for GHC ${ghcVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
+				`gf-language-server ${hlsVersion} or earlier for GHC ${ghcVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
 			);
 		} else {
 			super(
-				`haskell-language-server ${hlsVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
+				`gf-language-server ${hlsVersion} is not available on ${os.type()}. ${supportedReleasesLink}`
 			);
 		}
 	}
 }
 
-/** Works out what the project's ghc version is, downloading haskell-language-server-wrapper
+/** Works out what the project's ghc version is, downloading gf-language-server-wrapper
  * if needed. Returns null if there was an error in either downloading the wrapper or
  * in working out the ghc version
  */
@@ -205,16 +205,14 @@ async function getProjectGhcVersion(
 		);
 	};
 
-	const localWrapper = ['haskell-language-server-wrapper'].find(
-		executableExists
-	);
+	const localWrapper = ['gf-language-server-wrapper'].find(executableExists);
 	if (localWrapper) {
 		return callWrapper(localWrapper);
 	}
 
 	// Otherwise search to see if we previously downloaded the wrapper
 
-	const wrapperName = `haskell-language-server-wrapper-${release.tag_name}-${process.platform}${exeExt}`;
+	const wrapperName = `gf-language-server-wrapper-${release.tag_name}-${process.platform}${exeExt}`;
 	const downloadedWrapper = path.join(storagePath, wrapperName);
 
 	if (executableExists(downloadedWrapper)) {
@@ -229,7 +227,7 @@ async function getProjectGhcVersion(
 		throw new NoBinariesError(release.tag_name);
 	}
 
-	const assetName = `haskell-language-server-wrapper-${githubOS}${exeExt}`;
+	const assetName = `gf-language-server-wrapper-${githubOS}${exeExt}`;
 	const wrapperAsset = release.assets.find((x) =>
 		x.name.startsWith(assetName)
 	);
@@ -239,7 +237,7 @@ async function getProjectGhcVersion(
 	}
 
 	await downloadFile(
-		'Downloading haskell-language-server-wrapper',
+		'Downloading gf-language-server-wrapper',
 		wrapperAsset.browser_download_url,
 		downloadedWrapper
 	);
@@ -252,18 +250,12 @@ async function getReleaseMetadata(
 	storagePath: string,
 	logger: Logger
 ): Promise<IRelease[] | null> {
-	const releasesUrl = workspace.getConfiguration('haskell').releasesURL
-		? url.parse(workspace.getConfiguration('haskell').releasesURL)
+	const releasesUrl = workspace.getConfiguration('gf-lsp').releasesURL
+		? url.parse(workspace.getConfiguration('gf-lsp').releasesURL)
 		: undefined;
 	const opts: https.RequestOptions = releasesUrl
-		? {
-				host: releasesUrl.host,
-				path: releasesUrl.path
-		  }
-		: {
-				host: 'api.github.com',
-				path: '/repos/haskell/haskell-language-server/releases'
-		  };
+		? { host: releasesUrl.host, path: releasesUrl.path }
+		: { host: 'api.github.com', path: '/repos/anka-213/gf-lsp/releases' };
 
 	const offlineCache = path.join(storagePath, 'approvedReleases.cache.json');
 	const offlineCacheOldFormat = path.join(
@@ -324,12 +316,12 @@ async function getReleaseMetadata(
 	}
 	// Not all users want to upgrade right away, in that case prompt
 	const updateBehaviour = workspace
-		.getConfiguration('haskell')
+		.getConfiguration('gf-lsp')
 		.get('updateBehavior') as UpdateBehaviour;
 
 	if (updateBehaviour === 'never-check') {
 		logger.warn(
-			"As 'haskell.updateBehaviour' config option is set to 'never-check' " +
+			"As 'gf-lsp.updateBehaviour' config option is set to 'never-check' " +
 				'we try to use the possibly obsolete cached release data'
 		);
 		return readCachedReleaseData();
@@ -355,8 +347,8 @@ async function getReleaseMetadata(
 			) {
 				const promptMessage =
 					cachedInfoParsed === null
-						? 'No version of the haskell-language-server is installed, would you like to install it now?'
-						: 'A new version of the haskell-language-server is available, would you like to upgrade now?';
+						? 'No version of the gf-language-server is installed, would you like to install it now?'
+						: 'A new version of the gf-language-server is available, would you like to upgrade now?';
 
 				const decision = await window.showInformationMessage(
 					promptMessage,
@@ -383,33 +375,33 @@ async function getReleaseMetadata(
 			const cachedInfoParsed = await readCachedReleaseData();
 
 			window.showWarningMessage(
-				"Couldn't get the latest haskell-language-server releases from GitHub, used local cache instead: " +
+				"Couldn't get the latest gf-language-server releases from GitHub, used local cache instead: " +
 					githubError.message
 			);
 			return cachedInfoParsed;
 		} catch (fileError) {
 			throw new Error(
-				"Couldn't get the latest haskell-language-server releases from GitHub: " +
+				"Couldn't get the latest gf-language-server releases from GitHub: " +
 					githubError.message
 			);
 		}
 	}
 }
 /**
- * Downloads the latest haskell-language-server binaries from GitHub releases.
+ * Downloads the latest gf-language-server binaries from GitHub releases.
  * Returns null if it can't find any that match.
  */
-export async function downloadHaskellLanguageServer(
+export async function downloadGFLanguageServer(
 	context: ExtensionContext,
 	logger: Logger,
 	resource: Uri,
 	folder?: WorkspaceFolder
 ): Promise<string | null> {
 	// Make sure to create this before getProjectGhcVersion
-	logger.info('Downloading haskell-language-server');
+	logger.info('Downloading gf-language-server');
 
 	let storagePath: string | undefined = await workspace
-		.getConfiguration('haskell')
+		.getConfiguration('gf-lsp')
 		.get('releasesDownloadStoragePath');
 
 	if (!storagePath) {
@@ -427,7 +419,7 @@ export async function downloadHaskellLanguageServer(
 	if (githubOS === null) {
 		// Don't have any binaries available for this platform
 		window.showErrorMessage(
-			`Couldn't find any pre-built haskell-language-server binaries for ${process.platform}`
+			`Couldn't find any pre-built gf-language-server binaries for ${process.platform}`
 		);
 		return null;
 	}
@@ -435,11 +427,10 @@ export async function downloadHaskellLanguageServer(
 	logger.info('Fetching the latest release from GitHub or from cache');
 	const releases = await getReleaseMetadata(context, storagePath, logger);
 	const updateBehaviour = workspace
-		.getConfiguration('haskell')
+		.getConfiguration('gf-lsp')
 		.get('updateBehavior') as UpdateBehaviour;
 	if (!releases) {
-		let message =
-			"Couldn't find any pre-built haskell-language-server binaries";
+		let message = "Couldn't find any pre-built gf-language-server binaries";
 		if (updateBehaviour === 'never-check') {
 			message += ' (and checking for newer versions is disabled)';
 		}
@@ -447,9 +438,6 @@ export async function downloadHaskellLanguageServer(
 		return null;
 	}
 	logger.info(`The latest known release is ${releases[0].tag_name}`);
-	logger.info(
-		'Figure out the ghc version to use or advertise an installation link for missing components'
-	);
 	const dir: string = folder?.uri?.fsPath ?? path.dirname(resource.fsPath);
 	let ghcVersion: string;
 	try {
@@ -488,7 +476,7 @@ export async function downloadHaskellLanguageServer(
 
 	// When searching for binaries, use startsWith because the compression may differ
 	// between .zip and .gz
-	const assetName = `haskell-language-server-${githubOS}-${ghcVersion}${exeExt}`;
+	const assetName = `gf-lsp-${githubOS}-${ghcVersion}${exeExt}`;
 	logger.info(`Search for binary ${assetName} in release assets`);
 	const release = releases?.find((r) =>
 		r.assets.find((x) => x.name.startsWith(assetName))
@@ -498,41 +486,32 @@ export async function downloadHaskellLanguageServer(
 		let msg = new NoBinariesError(releases[0].tag_name, ghcVersion).message;
 		if (updateBehaviour === 'never-check') {
 			msg +=
-				". Consider set 'haskell.updateBehaviour' to 'up-to-date' to check if another release includes the missing binary";
+				". Consider set 'gf-lsp.updateBehaviour' to 'up-to-date' to check if another release includes the missing binary";
 		}
 		logger.error(msg);
 		window.showErrorMessage(msg);
 		return null;
 	}
 
-	const serverName = `haskell-language-server-${release?.tag_name}-${process.platform}-${ghcVersion}${exeExt}`;
+	const serverName = `gf-lsp-${release?.tag_name}-${process.platform}-${ghcVersion}${exeExt}`;
 	const binaryDest = path.join(storagePath, serverName);
 
 	logger.info(
 		`Looking for an existing ${binaryDest} or download it from release assets`
 	);
-	const title = `Downloading haskell-language-server ${release?.tag_name} for GHC ${ghcVersion}`;
+	const title = `Downloading gf-language-server ${release?.tag_name} for GHC ${ghcVersion}`;
 
 	const downloaded = await downloadFile(
 		title,
 		asset.browser_download_url,
 		binaryDest
 	);
-	if (ghcVersion.startsWith('9.')) {
-		const warning =
-			'Currently, HLS supports GHC 9 only partially. ' +
-			'See [issue #297](https://github.com/haskell/haskell-language-server/issues/297) for more details.';
-		logger.warn(warning);
-		if (downloaded) {
-			window.showWarningMessage(warning);
-		}
-	}
 	if (release?.tag_name !== releases[0].tag_name) {
 		const warning =
-			`haskell-language-server ${
+			`gf-language-server ${
 				releases[0].tag_name
 			} for GHC ${ghcVersion} is not available on ${os.type()}.  ` +
-			`Falling back to haskell-language-server ${release?.tag_name}`;
+			`Falling back to gf-language-server ${release?.tag_name}`;
 		logger.warn(warning);
 		if (downloaded) {
 			window.showWarningMessage(warning);

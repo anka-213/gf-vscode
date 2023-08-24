@@ -99,7 +99,7 @@ export class ExtensionLogger implements Logger {
 /** When making http requests to github.com, use this header otherwise
  * the server will close the request
  */
-const userAgentHeader = { 'User-Agent': 'vscode-haskell' };
+const userAgentHeader = { 'User-Agent': 'vscode-gf' };
 
 /** downloadFile may get called twice on the same src and destination:
  * When this happens, we should only download the file once but return two

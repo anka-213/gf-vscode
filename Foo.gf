@@ -1,0 +1,4 @@
+abstract Foo = {
+
+
+}

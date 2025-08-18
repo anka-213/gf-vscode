@@ -4,15 +4,9 @@ This provides syntax highlighting and a client for the [Grammatical Framework](h
 
 ## Installation
 
-### Linux and MacOS
+### Linux, Windows and MacOS
 
 The extension will automatically download and install the latest release for you.
-
-If you are running an M1 or M2 mac it will ask to autoamatically compile it on your computer, since I don't have access to an Apple Silicon Mac to compile it on.
-
-### Windows
-
-There is unfortunately no windows build yet. You can use the linux version in the [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) (WSL)
 
 ## Updating
 

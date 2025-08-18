@@ -163,10 +163,6 @@ export function executableExists(exe: string): boolean {
 }
 
 async function askToDownloadGfLanguageServer(context: ExtensionContext) {
-	if (process.platform === 'win32') {
-		throw new Error('Unfortunately Windows is not yet supported');
-	}
-
 	const archName = `${process.platform}-${process.arch}`;
 	if (archName === 'darwin-x64' || archName == 'linux-x64') {
 		// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
@@ -193,11 +189,8 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	const DownAuto = 'Download automatically';
 	const DownAutoNix = 'Install using nix';
 
-	// Apple silicon or some other strange platform
-	const isArm = process.arch === 'arm64';
-
 	const opts = [ToWebsite];
-	if (executableExists('nix-env') || isArm) {
+	if (executableExists('nix-env')) {
 		opts.unshift(DownAutoNix);
 	}
 	const answer = await window.showWarningMessage(

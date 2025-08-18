@@ -164,26 +164,26 @@ export function executableExists(exe: string): boolean {
 
 async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	const archName = `${process.platform}-${process.arch}`;
-	if (archName === 'darwin-x64' || archName == 'linux-x64') {
-		// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
-		const clientLogLevel =
-			workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
-		const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
+	// if (archName === 'darwin-x64' || archName == 'linux-x64') {
+	// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
+	const clientLogLevel =
+		workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
+	const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
 
-		const outputChannel: vscode.OutputChannel =
-			window.createOutputChannel('GF Language');
+	const outputChannel: vscode.OutputChannel =
+		window.createOutputChannel('GF Language');
 
-		// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
-		const logFilePath =
-			logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
-		const logger: Logger = new ExtensionLogger(
-			'client',
-			clientLogLevel,
-			outputChannel,
-			logFilePath
-		);
-		return await downloadGFLanguageServer(context, logger);
-	}
+	// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
+	const logFilePath =
+		logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
+	const logger: Logger = new ExtensionLogger(
+		'client',
+		clientLogLevel,
+		outputChannel,
+		logFilePath
+	);
+	return await downloadGFLanguageServer(context, logger);
+	// }
 
 	const ToWebsite = 'Go to Manual install instructions';
 	const DownAuto = 'Download automatically';

@@ -190,12 +190,14 @@ async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	const DownAutoNix = 'Install using nix';
 
 	const opts = [ToWebsite];
-	if (executableExists('nix-env')) {
+	let alternativeSolution = `You can try installing it manually according to the instructions on the website`;
+	if (executableExists('nix-env') || process.platform !== 'win32') {
 		opts.unshift(DownAutoNix);
+		alternativeSolution = `I can build it for you using nix, it will take ~5G disk space and around 5-15 minutes.`;
 	}
 	const answer = await window.showWarningMessage(
 		`No prebuilt executable is available for ${archName}.
-		I can build it for you using nix, it will take ~5G disk space and around 5-15 minutes.`,
+		${alternativeSolution}`,
 		...opts
 		// DownAuto
 	);

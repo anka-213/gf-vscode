@@ -165,64 +165,67 @@ export function executableExists(exe: string): boolean {
 async function askToDownloadGfLanguageServer(context: ExtensionContext) {
 	const archName = `${process.platform}-${process.arch}`;
 	// if (archName === 'darwin-x64' || archName == 'linux-x64') {
-	// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
-	const clientLogLevel =
-		workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
-	const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
+	try {
+		// const logLevel = workspace.getConfiguration('gf-lsp').trace.server;
+		const clientLogLevel =
+			workspace.getConfiguration('gf-lsp').trace.client ?? 'debug';
+		const logFile: string = workspace.getConfiguration('gf-lsp').logFile;
 
-	const outputChannel: vscode.OutputChannel =
-		window.createOutputChannel('GF Language');
+		const outputChannel: vscode.OutputChannel =
+			window.createOutputChannel('GF Language');
 
-	// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
-	const logFilePath =
-		logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
-	const logger: Logger = new ExtensionLogger(
-		'client',
-		clientLogLevel,
-		outputChannel,
-		logFilePath
-	);
-	return await downloadGFLanguageServer(context, logger);
-	// }
+		// ? path.resolve(currentWorkingDir, expandHomeDir(logFile))
+		const logFilePath =
+			logFile && logFile !== '' ? expandHomeDir(logFile) : undefined;
+		const logger: Logger = new ExtensionLogger(
+			'client',
+			clientLogLevel,
+			outputChannel,
+			logFilePath
+		);
+		return await downloadGFLanguageServer(context, logger);
+	} catch (e) {
+		const ToWebsite = 'Go to Manual install instructions';
+		const DownAuto = 'Download automatically';
+		const DownAutoNix = 'Install using nix';
 
-	const ToWebsite = 'Go to Manual install instructions';
-	const DownAuto = 'Download automatically';
-	const DownAutoNix = 'Install using nix';
-
-	const opts = [ToWebsite];
-	let alternativeSolution = `You can try installing it manually according to the instructions on the website`;
-	if (executableExists('nix-env') || process.platform !== 'win32') {
-		opts.unshift(DownAutoNix);
-		alternativeSolution = `I can build it for you using nix, it will take ~5G disk space and around 5-15 minutes.`;
-	}
-	const answer = await window.showWarningMessage(
-		`No prebuilt executable is available for ${archName}.
+		const opts = [ToWebsite];
+		let alternativeSolution = `You can try installing it manually according to the instructions on the website`;
+		if (executableExists('nix-env') || process.platform !== 'win32') {
+			opts.unshift(DownAutoNix);
+			alternativeSolution = `I can build it for you using nix, it will take ~5G disk space and around 5-15 minutes.`;
+		}
+		const answer = await window.showWarningMessage(
+			`No prebuilt executable is available for ${archName}.
 		${alternativeSolution}`,
-		...opts
-		// DownAuto
-	);
-	switch (answer) {
-		case ToWebsite:
-			vscode.env.openExternal(
-				vscode.Uri.parse('https://github.com/anka-213/gf-lsp/README.md')
-			);
-			break;
+			...opts
+			// DownAuto
+		);
+		switch (answer) {
+			case ToWebsite:
+				vscode.env.openExternal(
+					vscode.Uri.parse(
+						'https://github.com/anka-213/gf-lsp/README.md'
+					)
+				);
+				break;
 
-		// case DownAuto:
-		// 	return await downloadGFLanguageServer(context, logger);
-		// break;
-		case DownAutoNix:
-			return await downloadUsingNix(context);
+			// case DownAuto:
+			// 	return await downloadGFLanguageServer(context, logger);
+			// break;
+			case DownAutoNix:
+				return await downloadUsingNix(context);
 
-		case undefined:
-			console.log('Got undef');
-			break;
+			case undefined:
+				console.log('Got undef');
+				break;
 
-		default:
-			console.log('Got default');
-			break;
+			default:
+				console.log('Got default');
+				break;
+		}
+		return;
 	}
-	return;
 }
 
 // async function downloadGfLanguageServer(context: ExtensionContext) {

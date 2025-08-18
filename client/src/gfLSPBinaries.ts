@@ -486,13 +486,14 @@ export async function downloadGFLanguageServer(
 	);
 	const asset = release?.assets.find((x) => x.name.startsWith(assetName));
 	if (!asset) {
-		let msg = new NoBinariesError(releases[0].tag_name).message;
+		const err = new NoBinariesError(releases[0].tag_name);
 		if (updateBehaviour === 'never-check') {
-			msg +=
+			err.message +=
 				". Consider setting 'gf-lsp.updateBehaviour' to 'up-to-date' to check if another release includes the missing binary";
 		}
-		logger.error(msg);
-		window.showErrorMessage(msg);
+		logger.error(err.message);
+		window.showErrorMessage(err.message);
+		throw err;
 		return null;
 	}
 

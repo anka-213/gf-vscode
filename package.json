@@ -11,7 +11,9 @@
 	},
 	"publisher": "anka-213",
 	"icon": "gf-logo.png",
-	"categories": ["Programming Languages"],
+	"categories": [
+		"Programming Languages"
+	],
 	"keywords": [
 		"multi-root ready"
 	],
@@ -50,18 +52,18 @@
 					"scope": "machine",
 					"type": "string",
 					"enum": [
-					  "keep-up-to-date",
-					  "prompt",
-					  "never-check"
+						"keep-up-to-date",
+						"prompt",
+						"never-check"
 					],
 					"enumDescriptions": [
-					  "Always download the latest available version when it is published",
-					  "Prompt before upgrading to a newer version",
-					  "Don't check for newer versions"
+						"Always download the latest available version when it is published",
+						"Prompt before upgrading to a newer version",
+						"Don't check for newer versions"
 					],
 					"default": "keep-up-to-date",
 					"markdownDescription": "Determine what to do when a new version of the language server is available."
-				  },
+				},
 				"gf-lsp.serverExecutablePath": {
 					"scope": "resource",
 					"type": "string",
@@ -123,6 +125,7 @@
 		"esbuild": "^0.12.3",
 		"eslint": "^7.26.0",
 		"mocha": "^8.3.2",
+		"ovsx": "^0.10.6",
 		"typescript": "^4.2.3",
 		"vsce": "^1.88.0"
 	}

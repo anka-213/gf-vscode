@@ -58,3 +58,4 @@ nix-env -iA exe -f https://github.com/anka-213/gf-lsp/archive/main.tar.gz # Down
 - Bump the version number in package.json
 - Tag the commit with a version number
 - `node_modules/.bin/vsce package && node_modules/.bin/vsce publish`
+- `node_modules/.bin/ovsx publish gf-vscode-{version-number}.vsix`
